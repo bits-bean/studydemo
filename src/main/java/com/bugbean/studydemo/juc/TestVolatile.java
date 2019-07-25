@@ -11,11 +11,9 @@ public class TestVolatile {
         new Thread(threadDemo).start();
 
         while (true) {
-            synchronized (threadDemo) {
-                if (threadDemo.isFlag()) {
+            if (threadDemo.isFlag()) {
                     System.out.println("---------------");
                     break;
-                }
             }
         }
     }
@@ -27,7 +25,7 @@ class ThreadDemo implements Runnable {
     private boolean flag = false;
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
