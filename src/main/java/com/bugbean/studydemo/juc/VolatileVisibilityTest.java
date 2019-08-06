@@ -1,6 +1,6 @@
 package com.bugbean.studydemo.juc;
 
-public class MyTest {
+public class VolatileVisibilityTest {
     public static void main(String[] args) {
 
         Data data = new Data();
@@ -25,14 +25,3 @@ public class MyTest {
 
 }
 
-class Data {
-    private volatile int number = 0;
-
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-}
