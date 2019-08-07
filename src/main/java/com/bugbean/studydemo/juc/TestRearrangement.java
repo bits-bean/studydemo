@@ -21,21 +21,4 @@ public class TestRearrangement {
 			System.out.println("a=" + a);
 		}
 	}
-
-	public static void main(String[] args) {
-
-		TestRearrangement test = new TestRearrangement();
-
-		new Thread(() -> {
-			test.method1();
-		}).start();
-
-		for (int i = 0; i < 10000; i++) {
-			new Thread(() -> {
-				test.method2();
-			}).start();
-		}
-
-	}
-
 }
