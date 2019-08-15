@@ -20,6 +20,9 @@ public class ReentryTester {
 
 class Phone {
 	public synchronized void sendSMS() {
+		synchronized(this.getClass()){
+
+		}
 		System.out.println(Thread.currentThread().getName() + " sendSMS");
 		sendEmail();
 	}
