@@ -1,0 +1,44 @@
+@startuml
+
+abstract class AbstractQueuedSynchronizer
+abstract class AbstractOwnableSynchronizer
+
+class ReentrantLock
+abstract class ReentrantLock.Sync
+ReentrantLock +-- ReentrantLock.Sync
+ReentrantLock +-- ReentrantLock.FairSync
+ReentrantLock +-- ReentrantLock.NonfairSync
+ReentrantLock.Sync <|-- ReentrantLock.FairSync
+ReentrantLock.Sync <|-- ReentrantLock.NonfairSync
+
+class Semaphore
+abstract class Semaphore.Sync
+Semaphore +-- Semaphore.Sync
+Semaphore +-- Semaphore.FairSync
+Semaphore +-- Semaphore.NonfairSync
+Semaphore.Sync <|-- Semaphore.FairSync
+Semaphore.Sync <|-- Semaphore.NonfairSync
+
+class ReentrantReadWriteLock
+abstract class ReentrantReadWriteLock.Sync
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.Sync
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.FairSync
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.NonfairSync
+ReentrantReadWriteLock.Sync <|-- ReentrantReadWriteLock.FairSync
+ReentrantReadWriteLock.Sync <|-- ReentrantReadWriteLock.NonfairSync
+
+class CountDownLatch
+CountDownLatch +-- CountDownLatch.Sync
+
+class ThreadPoolExecutor
+ThreadPoolExecutor +-- ThreadPoolExecutor.Worker
+
+AbstractOwnableSynchronizer <|-- AbstractQueuedSynchronizer
+
+AbstractQueuedSynchronizer <|-- ReentrantLock.Sync
+AbstractQueuedSynchronizer <|-- Semaphore.Sync
+AbstractQueuedSynchronizer <|-- ReentrantReadWriteLock.Sync
+AbstractQueuedSynchronizer <|-- CountDownLatch.Sync
+AbstractQueuedSynchronizer <|-- ThreadPoolExecutor.Worker
+
+@enduml
