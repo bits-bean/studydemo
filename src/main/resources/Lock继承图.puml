@@ -1,0 +1,27 @@
+@startuml
+
+interface Lock
+interface ReadWriteLock
+class ReentrantLock
+class ReentrantReadWriteLock
+class StampedLock
+
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.ReadLock
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.WriteLock
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.FairSync
+ReentrantReadWriteLock +-- ReentrantReadWriteLock.NonfairSync
+
+ReentrantLock +-- ReentrantLock.FairSync
+ReentrantLock +-- ReentrantLock.NonfairSync
+
+StampedLock +-- StampedLock.ReadLockView
+StampedLock +-- StampedLock.WriteLockView
+
+ReadWriteLock <|.. ReentrantReadWriteLock
+Lock <|.. ReentrantReadWriteLock.ReadLock
+Lock <|.. ReentrantReadWriteLock.WriteLock
+Lock <|.. StampedLock.ReadLockView
+Lock <|.. StampedLock.WriteLockView
+Lock <|.. ReentrantLock
+
+@enduml

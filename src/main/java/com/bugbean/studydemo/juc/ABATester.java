@@ -16,7 +16,6 @@ public class ABATester {
 		//获取v值和初始版本号
 		Integer expectedReference = i.getReference();
 		int expectedStamp = i.getStamp();
-
 		//开启线程T对V值修改两次
 		new Thread(() -> {
 			Integer expectedReference1 = i.getReference();

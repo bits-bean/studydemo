@@ -1,0 +1,15 @@
+@startuml
+
+interface Lock
+class ReentrantLock
+abstract class ReentrantLock.Sync
+
+Lock <|.. ReentrantLock
+
+ReentrantLock +-- ReentrantLock.Sync
+ReentrantLock +-- ReentrantLock.FairSync
+ReentrantLock +-- ReentrantLock.NonfairSync
+ReentrantLock.Sync <|-- ReentrantLock.FairSync
+ReentrantLock.Sync <|-- ReentrantLock.NonfairSync
+
+@enduml
