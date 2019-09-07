@@ -1,5 +1,7 @@
 package com.bugbean.studydemo.juc;
 
+import sun.misc.Unsafe;
+
 /**
  * @author dugm
  * @description
@@ -8,7 +10,12 @@ package com.bugbean.studydemo.juc;
 public class BlockingQueueTester {
 	public static void main(String[] args) throws InterruptedException {
 //		BlockingQueue
-		Object lock = new Object();
-		lock.wait();
+//		Object lock = new Object();
+//		lock.wait();
+//		ThreadPoolExecutor
+//		Executors.newFixedThreadPool(10);
+//		Executors.newCachedThreadPool();
+//		Executors.newSingleThreadExecutor();
+		Unsafe unsafe = Unsafe.getUnsafe();
 	}
 }
