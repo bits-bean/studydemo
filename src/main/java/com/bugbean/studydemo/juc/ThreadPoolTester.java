@@ -4,6 +4,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author dugm
@@ -29,5 +32,11 @@ public class ThreadPoolTester {
 		//					new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
 		//							threadFactory));
 		//		}
+
+		Lock lock = new ReentrantLock();
+		Condition conditionA = lock.newCondition();
+		Condition conditionB = lock.newCondition();
+		Condition conditionC = lock.newCondition();
+		conditionA.signal();
 	}
 }
