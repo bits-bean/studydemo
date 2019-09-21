@@ -3,10 +3,7 @@ package com.bugbean.studydemo.io;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * @author dugm
@@ -105,5 +102,51 @@ public class FrwTester {
 				}
 			}
 		}
+	}
+
+	@Test
+	public void testCopy() {
+		long start = System.currentTimeMillis();
+		copy("F:\\学习资料\\尚硅谷第38季公开课-快速入门JVM\\jvm.avi", "C:\\Users\\Administrator\\Desktop\\copy.avi");
+		long end = System.currentTimeMillis();
+		System.out.println((end - start) + "ms");
+	}
+
+	public void copy(String src, String dest) {
+		BufferedInputStream bufferedInputStream = null;
+		BufferedOutputStream bufferedOutputStream = null;
+		try {
+
+			File file = new File(src);
+			bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+			File copyFile = new File(dest);
+			bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(copyFile));
+
+			byte[] bytes = new byte[1024];
+
+			int len;
+			while ((len = bufferedInputStream.read(bytes)) != -1) {
+				bufferedOutputStream.write(bytes, 0, len);
+			}
+		} catch (IOException e) {
+
+		} finally {
+			if (bufferedInputStream != null) {
+				try {
+					bufferedInputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (bufferedOutputStream != null) {
+				try {
+					bufferedInputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 	}
 }
