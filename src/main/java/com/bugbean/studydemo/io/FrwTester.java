@@ -105,43 +105,44 @@ public class FrwTester {
 	}
 
 	@Test
-	public void testCopy() {
+	public void testCopy() throws FileNotFoundException {
+
+		String src = "F:\\学习资料\\尚硅谷第38季公开课-快速入门JVM\\jvm.avi";
+		String dest = "C:\\Users\\Administrator\\Desktop\\copy.avi";
+
+				InputStream is = new BufferedInputStream(new FileInputStream(new File(src)));
+//		InputStream is = new FileInputStream(new File(src));
+
+				OutputStream os = new BufferedOutputStream(new FileOutputStream(new File(dest)));
+//		OutputStream os = new FileOutputStream(new File(dest));
+
 		long start = System.currentTimeMillis();
-		copy("F:\\学习资料\\尚硅谷第38季公开课-快速入门JVM\\jvm.avi", "C:\\Users\\Administrator\\Desktop\\copy.avi");
+		copy(src, dest, is, os);
 		long end = System.currentTimeMillis();
 		System.out.println((end - start) + "ms");
 	}
 
-	public void copy(String src, String dest) {
-		BufferedInputStream bufferedInputStream = null;
-		BufferedOutputStream bufferedOutputStream = null;
+	public void copy(String src, String dest, InputStream inputStream, OutputStream outputStream) {
 		try {
-
-			File file = new File(src);
-			bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-
-			File copyFile = new File(dest);
-			bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(copyFile));
-
-			byte[] bytes = new byte[1024];
+			byte[] bytes = new byte[8192];
 
 			int len;
-			while ((len = bufferedInputStream.read(bytes)) != -1) {
-				bufferedOutputStream.write(bytes, 0, len);
+			while ((len = inputStream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, len);
 			}
 		} catch (IOException e) {
 
 		} finally {
-			if (bufferedInputStream != null) {
+			if (inputStream != null) {
 				try {
-					bufferedInputStream.close();
+					inputStream.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			if (bufferedOutputStream != null) {
+			if (outputStream != null) {
 				try {
-					bufferedInputStream.close();
+					outputStream.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
