@@ -1,7 +1,5 @@
 package com.bugbean.studydemo.juc;
 
-import sun.misc.Unsafe;
-
 /**
  * @author dugm
  * @description
@@ -16,6 +14,6 @@ public class BlockingQueueTester {
 //		Executors.newFixedThreadPool(10);
 //		Executors.newCachedThreadPool();
 //		Executors.newSingleThreadExecutor();
-		Unsafe unsafe = Unsafe.getUnsafe();
+//		Unsafe unsafe = Unsafe.getUnsafe();
 	}
 }
