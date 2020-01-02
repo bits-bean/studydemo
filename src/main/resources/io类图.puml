@@ -1,0 +1,32 @@
+@startuml
+
+abstract class OutputStream
+class FilterOutputStream
+
+package 具体构件 <<Rectangle>> {
+    class FileOutputStream
+    class ByteArrayOutputStream
+    class PipedOutputStream
+}
+
+package 具体装饰类 <<Rectangle>> {
+    class BufferedOutputStream
+    class PrintStream
+}
+
+OutputStream <|-- FilterOutputStream
+FilterOutputStream o-- OutputStream
+
+OutputStream <|-- FileOutputStream
+OutputStream <|-- ByteArrayOutputStream
+OutputStream <|-- PipedOutputStream
+
+FilterOutputStream <|-- BufferedOutputStream
+FilterOutputStream <|-- PrintStream
+
+
+
+note left of OutputStream : 抽象构件
+note left of FilterOutputStream : 装饰类
+
+@enduml
