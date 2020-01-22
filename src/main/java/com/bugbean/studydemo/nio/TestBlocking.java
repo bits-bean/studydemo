@@ -10,6 +10,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 1通道
@@ -46,6 +48,11 @@ public class TestBlocking {
 
     @Test
     public void server() throws IOException {
+
+        Map<Object, Object> objectObjectHashMap = new HashMap<>();
+        objectObjectHashMap.put(null,null);
+        objectObjectHashMap.put(1,1);
+
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.bind(new InetSocketAddress(9898));
 
