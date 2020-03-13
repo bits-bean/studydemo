@@ -24,5 +24,6 @@ public class Tester {
 	}
 
 	public static void main(String[] args) {
+		new Tester().method1();
 	}
 }
