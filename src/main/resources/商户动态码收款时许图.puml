@@ -1,0 +1,156 @@
+@startuml
+title 订单二维码收款时序图
+participant 商户App as merApp
+participant 用户APP as app
+participant 即时收单服务 as trade
+participant redis
+participant mq
+participant 营销中心 as marketing
+'participant 凭证中心 as voucher
+participant 风控中心 as risk
+participant DB
+participant 安全中心
+participant 用户中心
+participant 计费服务
+participant 交易引擎 as tradeEngine
+participant 收银台 as cashier
+
+autonumber
+merApp -> trade: 输入订单金额
+activate trade
+trade -> redis: 获取商户信息缓存
+note left
+若商户信息有改动，商户中心会发消息到mq，
+这边监听到，且删除旧缓存并会查询最新的
+信息更新到缓存保证缓存与数据库一致。（商
+户中心那边也有缓存，为防止缓存雪崩，商户
+中心那边的缓存失效时间和这边的错开，并用分
+布式锁确保只有一个进程对重建缓存）
+end note
+activate redis
+redis --> trade:
+deactivate redis
+trade -> trade: 商户检验
+trade -> risk:商户风控
+activate risk
+trade <-- risk
+deactivate risk
+trade -> trade: 生成二维码(并把订单信息存入二维码中)
+note left
+在改造前，这一步是将订单入库，导致产生了大量
+废单（因为很多订单没人支付），数据量剧增到500万+。
+把订单信息存入二维码中的目的是利用客户端存储，
+等到用户扫码时再把订单信息带过来，再入库。
+end note
+merApp <-- trade: 返回收款人信息和二维码
+deactivate trade
+
+app -> trade: 扫一扫
+activate trade
+trade -> trade: 解析二维码内容
+trade -> trade: 获取订单信息(订单号,收款方,收银员,金额,币种)
+trade -> redis: 获取付款方信息
+activate redis
+redis --> trade:
+deactivate redis
+trade -> DB: 收单信息入库
+activate DB
+trade <-- DB
+deactivate DB
+trade -> mq: 把收单信息和任务信息推到mq
+activate mq
+trade <-- mq
+deactivate mq
+trade --> app: 返回订单信息
+deactivate trade
+
+mq -> tradeEngine: 监听消息
+note right
+交易引擎的线程池，所以这一步做了
+降级和熔断处理，实现快速失败，并且做
+了资源隔离，不会导致故障蔓延
+end note
+activate tradeEngine
+tradeEngine->tradeEngine:创建CountDownLatch对象，放进ConcurrentHashMap
+tradeEngine-->DB:核心交易单入库（状态：支付中）
+activate DB
+tradeEngine<--DB
+deactivate DB
+tradeEngine --> risk: 查询用户风控
+activate risk
+tradeEngine <-- risk
+deactivate risk
+tradeEngine --> 用户中心: 查询用户是否黑名单
+activate 用户中心
+tradeEngine <-- 用户中心
+deactivate 用户中心
+tradeEngine-->redis:写缓存
+activate redis
+tradeEngine<--redis
+deactivate redis
+tradeEngine-->计费服务:计费
+activate 计费服务
+tradeEngine<--计费服务
+deactivate 计费服务
+tradeEngine-->mq
+deactivate tradeEngine
+
+app -> trade: 按下"立即支付"按钮
+activate trade
+trade->marketing:组装支付工具
+activate marketing
+trade<--marketing
+deactivate marketing
+trade-->app
+deactivate trade
+
+app -> trade: 确认支付并输入密码
+activate trade
+trade->安全中心:校验密码
+activate 安全中心
+trade<--安全中心
+deactivate 安全中心
+trade->tradeEngine
+activate tradeEngine
+tradeEngine->tradeEngine:从ConcurrentHashMap取出CountDownLatch对象，await()
+tradeEngine->DB:查询核心交易单
+note right
+若核心交易单不存在，把20-29步骤同步走一遍
+end note
+activate DB
+tradeEngine<--DB
+deactivate DB
+trade<--tradeEngine
+tradeEngine->cashier:支付流程
+activate cashier
+tradeEngine<--cashier
+deactivate cashier
+tradeEngine-->trade
+deactivate tradeEngine
+trade-->app
+deactivate trade
+'activate trade
+'trade -> trade: 支付前置校验
+'trade -> trade: 风控校验
+'trade -> trade: 锁订单
+'alt 异步入库失败或速度慢
+'trade -> redis: 到缓存获取订单信息
+'redis --> trade
+'trade -> trade: 入库并锁单
+'end
+'trade -> cashier: 发起创建收银流水请求
+
+'activate cashier
+'cashier -> cashier: 缓存支付工具
+'cashier -> voucher: 创建凭证
+'activate voucher
+'cashier <-- voucher: 返回凭证
+'deactivate voucher
+'cashier -> cashier: 创建流水(state:10)
+'trade <-- cashier: 返回收银流水
+'deactivate cashier
+'trade -> trade: 更新交易订单(state:10->11)
+'app <-- trade: 返回凭证号
+'deactivate trade
+
+@enduml
