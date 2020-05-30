@@ -1,0 +1,67 @@
+@startuml
+activate app
+
+app -> 交易:扫码
+activate 交易
+交易->交易:RPC校验、风控等
+交易->交易:收单入库
+交易-->app
+deactivate 交易
+
+app->收银台:选择支付工具和优惠券并确认支付
+activate 收银台
+收银台->DB:创建支付流水
+activate DB
+收银台<--DB
+deactivate DB
+收银台-->app
+deactivate 收银台
+
+支付引擎->分布式锁:获取锁
+activate 支付引擎
+activate 分布式锁
+
+支付引擎->DB:捞出支付流水
+activate DB
+支付引擎->支付引擎:读取支付工具
+支付引擎->支付引擎:一些RPC
+支付引擎->支付引擎:支付检查
+支付引擎->支付引擎:风控检查
+支付引擎->支付引擎:支付路由
+支付引擎->营销:锁定优惠券
+activate 营销
+支付引擎<--营销
+deactivate 营销
+支付引擎<--DB
+deactivate DB
+支付引擎<--分布式锁:释放锁
+deactivate 分布式锁
+deactivate 支付引擎
+
+app->收银台:输入密码
+activate 收银台
+收银台->分布式锁:获取锁
+activate 分布式锁
+收银台->DB:查询支付流水，并检查处理结果
+activate DB
+DB-->收银台
+deactivate DB
+收银台->MQ:预发送2条消息（因为不知道动账结果，成功和失败的消息都预发送到可靠消息服务）
+收银台->账户:减余额
+activate 账户
+账户->账户:记录账务流水
+收银台<--账户
+deactivate 账户
+收银台->收银台:
+收银台->MQ:确认发送
+app<--收银台:返回支付结果
+deactivate app
+收银台<--分布式锁:释放锁
+deactivate 分布式锁
+deactivate 收银台
+
+MQ->收银台:根据支付结果修改流水状态
+MQ->交易:根据支付结果修改交易状态
+MQ->营销:根据支付结果释放或核销优惠券
+
+@enduml

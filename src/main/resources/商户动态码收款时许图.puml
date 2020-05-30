@@ -66,9 +66,10 @@ deactivate trade
 
 mq -> tradeEngine: 监听消息
 note right
-交易引擎的线程池，所以这一步做了
-降级和熔断处理，实现快速失败，并且做
-了资源隔离，不会导致故障蔓延
+交易引擎的线程池maxSize=40（CPU4核），
+coreSize=30，经常会打满，所以这一步做
+了降级和熔断处理，实现快速失败，并且做了
+资源隔离，不会导致故障蔓延
 end note
 activate tradeEngine
 tradeEngine->tradeEngine:创建CountDownLatch对象，放进ConcurrentHashMap
@@ -122,6 +123,12 @@ tradeEngine<--DB
 deactivate DB
 trade<--tradeEngine
 tradeEngine->cashier:支付流程
+note left
+这步有可能是瓶颈，因为结果必须同步，
+而效率取决于账户服务，所以这一步做了
+降级和熔断处理，实现快速失败，并且做
+了资源隔离，不会导致故障蔓延
+end note
 activate cashier
 tradeEngine<--cashier
 deactivate cashier
